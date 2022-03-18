@@ -2,7 +2,8 @@ const express = require('express')
 const app = express()
 const mongoose = require('mongoose')
 const userRoutes = require('./routes/user');
-const saucesRoutes = require ('./routes/sauces')
+const saucesRoutes = require('./routes/sauces')
+const path = require("path")
 
 app.use((req, res, next) => {
     res.setHeader('Access-Control-Allow-Origin', '*');
@@ -21,5 +22,6 @@ useUnifiedTopology: true })
 app.use(express.json());
 app.use('/api/auth', userRoutes);
 app.use ('/api/sauces', saucesRoutes)
+app.use('/images', express.static(path.join(__dirname,"images")))
 
 module.exports = app;
