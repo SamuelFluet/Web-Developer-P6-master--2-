@@ -93,22 +93,15 @@ exports.likeSauce = (req, res, next)=>{
         });
       }
     );
-  }
-}
-
-exports.dislikeSauce = (req, res, next)=>{
-  const userId = req.body.userId;
-  const like = req.body.like;
-  const sauceId = req.params.id;
-  if (like == -1){
+  }else if ( like == -1){
     Sauce.updateOne(
       {
         _id:req.params.id      
       },
       {
         //incrémente la valeur du like
-        $inc:{likes:-1},
-        $push:{usersLiked:userId}
+        $inc:{dislikes:+1},
+        $push:{usersDisLiked:userId}
       }
     ).then(()=>{
       res.status(200).json({
@@ -121,5 +114,58 @@ exports.dislikeSauce = (req, res, next)=>{
         });
       }
     );
+
+  }else if(like == 0){
+    Sauce.findOne(
+      {
+        _id:req.params.id 
+      },    
+    ).then((sauce)=>{
+      if(sauce.usersLiked.includes(userId)){
+        Sauce.updateOne(
+          {
+            _id:req.params.id      
+          },
+          {
+            //incrémente la valeur du like
+            $inc:{likes:-1},
+            $pull:{usersLiked:userId}
+          }
+        ).then(()=>{
+          res.status(200).json({
+            message :"Reset liked"
+          })
+        }).catch(
+          (error) => {
+            res.status(400).json({
+              error: error
+            });
+          }
+        );
+
+      }else{
+        Sauce.updateOne(
+          {
+            _id:req.params.id      
+          },
+          {
+            //incrémente la valeur du like
+            $inc:{dislikes:-1},
+            $pull:{usersDisLiked:userId}
+          }
+        ).then(()=>{
+          res.status(200).json({
+            message :"Reset disliked"
+          })
+        }).catch(
+          (error) => {
+            res.status(400).json({
+              error: error
+            });
+          }
+        );
+      }
+    })
   }
 }
+
